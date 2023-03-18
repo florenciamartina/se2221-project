@@ -25,13 +25,15 @@ public class Main {
         do {
             System.out.println("Enter balungan");
             balungan = input.nextLine();
-        } while (!isMultipleOf4(balungan) && !startsWithRest(balungan));
+            balungan = balungan.replaceAll("\\s", "");
+        } while (!isMultipleOf4(balungan) || startsWithRest(balungan));
 
         do {
             System.out.println("Enter irama");
             irama = input.nextLine();
         } while (!isValidIrama(irama));
 
+        balungan = balungan.replaceAll("\\s", "");
         System.out.println("Balungan is: " + balungan);
         System.out.println("Irama is: " + irama);
 
@@ -46,7 +48,7 @@ public class Main {
     }
 
     public static boolean startsWithRest(String balungan) {
-        return balungan.charAt(0) == '_';
+        return balungan.charAt(0) == REST_NOTE;
     }
 
     public static boolean isValidIrama(String irama) {
