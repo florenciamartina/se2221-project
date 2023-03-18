@@ -1,4 +1,8 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
+
 import static java.util.Map.entry;
 
 public class Main {
@@ -12,40 +16,56 @@ public class Main {
             entry('6', new Character[]{'5', '7'}),
             entry('7', new Character[]{'6'})
     );
+
     public static void main(String args[]) throws Exception {
         Scanner input = new Scanner(System.in);
+        String balungan;
+        String irama;
 
-        System.out.println("Enter balungan");
-        String balungan = input.nextLine();
+        do {
+            System.out.println("Enter balungan");
+            balungan = input.nextLine();
+        } while (!isMultipleOf4(balungan) && !startsWithRest(balungan));
 
-        System.out.println("Enter irama");
-        String irama = input.nextLine();
+        do {
+            System.out.println("Enter irama");
+            irama = input.nextLine();
+        } while (!isValidIrama(irama));
 
         System.out.println("Balungan is: " + balungan);
         System.out.println("Irama is: " + irama);
 
         System.out.println("Bonang(Mipil) pattern is: " + getBonang(balungan, irama));
-
-        // TODO : Write to file, align the notes
         System.out.println("Peking pattern is : " + getPeking(balungan, irama));
+
+        alignNotes(balungan, getBonang(balungan, irama), getPeking(balungan, irama), irama);
+    }
+
+    public static boolean isMultipleOf4(String balungan) {
+        return balungan.length() >= 4 && balungan.length() % 4 == 0;
+    }
+
+    public static boolean startsWithRest(String balungan) {
+        return balungan.charAt(0) == '_';
+    }
+
+    public static boolean isValidIrama(String irama) {
+        return irama.equals("1") || irama.equals("2");
     }
 
     public static String getBonang(String balungan, String irama) {
         String result = "";
-
         for (int i = 2; i <= balungan.length(); i += 2) {
             char a = balungan.charAt(i - 2);
             char b = balungan.charAt(i - 1);
 
             String pattern = "" + a + b + a + "-";
-
             if (irama.equals("2")) {
                 pattern = pattern + "-" + b + a + "-";
             }
 
             result = result + pattern;
         }
-
         return result;
     }
 
@@ -59,7 +79,7 @@ public class Main {
         char neighbour = getNeighbour(a);
         String pattern = "" + neighbour + neighbour + a + a;
 
-        if(irama.equals("1")) {
+        if (irama.equals("1")) {
             return pattern;
         } else {
             StringBuilder sb = new StringBuilder();
@@ -70,15 +90,15 @@ public class Main {
 
     public static String handleRest(char a, char b, char prev, String irama) {
         String pattern = "";
-        if(b == REST_NOTE) {
+        if (b == REST_NOTE) {
             return handleRepetition(a, irama);
         }
 
-        if(a == REST_NOTE) {
+        if (a == REST_NOTE) {
             pattern = "" + prev + prev + b + b;
         }
 
-        if(irama.equals("1")) {
+        if (irama.equals("1")) {
             return pattern;
         } else {
             StringBuilder sb = new StringBuilder();
@@ -86,6 +106,7 @@ public class Main {
             return sb.toString();
         }
     }
+
     public static String getPeking(String balungan, String irama) {
         // TODO : Assuming first note is never REST note. Must handle later.
         StringBuilder sb = new StringBuilder();
@@ -93,9 +114,9 @@ public class Main {
             char a = balungan.charAt(i - 2);
             char b = balungan.charAt(i - 1);
 
-            if(a == b) {
+            if (a == b) {
                 sb.append(handleRepetition(a, irama));
-            } else if(a == REST_NOTE || b == REST_NOTE) {
+            } else if (a == REST_NOTE || b == REST_NOTE) {
                 char prev = balungan.charAt(i - 3);
                 sb.append(handleRest(a, b, prev, irama));
             } else {
@@ -104,8 +125,37 @@ public class Main {
                     sb.append("").append(a).append(a).append(b).append(b);
                 }
             }
-            sb.append(" ");
         }
         return sb.toString();
+    }
+
+    public static void alignNotes(String balungan, String bonang, String peking, String irama) {
+        try {
+            File file = new File("alignment.txt");
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(file);
+
+            // separation for the balungan notes so that it aligns with peking and bonang
+            String spacing = irama.equals("1") ? "" + REST_NOTE : "" + REST_NOTE + REST_NOTE + REST_NOTE;
+            String newBalungan = "";
+            for (int i = 0; i < balungan.length(); i++) {
+                newBalungan = newBalungan + spacing + balungan.charAt(i);
+            }
+            newBalungan = newBalungan + REST_NOTE;
+
+            fw.write(newBalungan);
+            fw.write(System.lineSeparator());
+            fw.write(REST_NOTE + peking);
+            fw.write(System.lineSeparator());
+            fw.write(bonang + REST_NOTE);
+
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred when creating the file.");
+            e.printStackTrace();
+        }
     }
 }
