@@ -33,7 +33,6 @@ public class Main {
             irama = input.nextLine();
         } while (!isValidIrama(irama));
 
-        balungan = balungan.replaceAll("\\s", "");
         System.out.println("Balungan is: " + balungan);
         System.out.println("Irama is: " + irama);
 
@@ -110,7 +109,6 @@ public class Main {
     }
 
     public static String getPeking(String balungan, String irama) {
-        // TODO : Assuming first note is never REST note. Must handle later.
         StringBuilder sb = new StringBuilder();
         for (int i = 2; i <= balungan.length(); i += 2) {
             char a = balungan.charAt(i - 2);
@@ -122,9 +120,9 @@ public class Main {
                 char prev = balungan.charAt(i - 3);
                 sb.append(handleRest(a, b, prev, irama));
             } else {
-                sb.append("").append(a).append(a).append(b).append(b);
+                sb.append(a).append(a).append(b).append(b);
                 if (irama.equals("2")) {
-                    sb.append("").append(a).append(a).append(b).append(b);
+                    sb.append(a).append(a).append(b).append(b);
                 }
             }
         }
