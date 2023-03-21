@@ -136,7 +136,7 @@ public class Main {
 
     public static void alignNotes(String balungan, String bonang, String peking, String irama) {
         try {
-            File file = new File("alignment.txt");
+            File file = new File("alignment.json");
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -151,12 +151,37 @@ public class Main {
             }
             newBalungan = newBalungan + REST_NOTE;
 
-            fw.write(newBalungan);
-            fw.write(System.lineSeparator());
-            fw.write(REST_NOTE + peking);
-            fw.write(System.lineSeparator());
-            fw.write(bonang + REST_NOTE);
+            JSONObject track1 = new JSONObject();
+            track1.put("notes", newBalungan);
+            track1.put("instrument", "bonang");
 
+            JSONObject track2 = new JSONObject();
+            track2.put("instrument", "bonang");
+            track2.put("notes", REST_NOTE + peking);
+
+            JSONObject track3 = new JSONObject();
+            track3.put("instrument", "bonang");
+            track3.put("notes", bonang + REST_NOTE);
+
+            List<JSONObject> lsOfTracks = new ArrayList<>();
+            lsOfTracks.add(track1);
+            lsOfTracks.add(track2);
+            lsOfTracks.add(track3);
+
+            JSONObject sequence1 = new JSONObject();
+            sequence1.put("tracks", lsOfTracks);
+
+            JSONObject obj = new JSONObject();
+            obj.put("sequence", sequence1);
+
+            List<JSONObject> lsOfSequences = new ArrayList<>();
+            lsOfSequences.add(obj);
+
+            JSONObject gamelan = new JSONObject();
+            gamelan.put("tempo", 400);
+            gamelan.put("structure", lsOfSequences);
+
+            fw.write(gamelan.toString());
             fw.close();
         } catch (IOException e) {
             System.out.println("An error occurred when creating the file.");
