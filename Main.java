@@ -64,11 +64,23 @@ public class Main {
         return irama.equals("1") || irama.equals("2");
     }
 
+    public static String handleBonangRepetition(char a, String irama) {
+        String pattern = "" + a + a + a + REST_NOTE + a + a + REST_NOTE + REST_NOTE;
+        if(irama == "2") {
+            return pattern + pattern;
+        }
+        return pattern;
+    }
+
     public static String getBonang(String balungan, String irama) {
         StringBuilder result = new StringBuilder();
         for (int i = 2; i <= balungan.length(); i += 2) {
             char a = balungan.charAt(i - 2);
             char b = balungan.charAt(i - 1);
+
+            if(a == b) {
+                return handleBonangRepetition(a, irama);
+            }
 
             if (a == REST_NOTE && i >= 3) {
                 a = balungan.charAt(i - 3);
